@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+JAR="$ROOT/target/codex-java.jar"
+
+if [[ ! -f "$JAR" ]]; then
+  echo "Building codex-java..." >&2
+  mvn -q -f "$ROOT/pom.xml" -DskipTests package
+fi
+
+exec java -jar "$JAR" "$@"

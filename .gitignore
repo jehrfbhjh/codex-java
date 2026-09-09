@@ -1,0 +1,15 @@
+.idea/
+*.iml
+
+target/
+*.class
+
+.DS_Store
+
+.env
+.env.*
+!.env.example
+
+*.log
+trace.jsonl
+*-trace.jsonl
