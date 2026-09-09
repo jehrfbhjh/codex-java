@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Codex Java</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7.4 3.8 12 1.2l4.6 2.6 4.5 2.6v11.2l-4.5 2.6L12 22.8l-4.6-2.6-4.5-2.6V6.4l4.5-2.6Z"></path><path d="m8.1 8.2 3.9-2.3 3.9 2.3v4.6L12 15.1l-3.9-2.3V8.2Z"></path></svg>
+        </div>
+        <span>Codex Java</span>
+        <button class="icon-button sidebar-close" id="sidebar-close" aria-label="关闭侧栏">
+          <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+        </button>
+      </div>
+
+      <button class="new-thread" id="new-thread">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+        <span>新建任务</span>
+        <kbd>⌘ N</kbd>
+      </button>
+
+      <div class="sidebar-section">
+        <div class="section-label">最近任务</div>
+        <div class="thread-list" id="thread-list">
+          <div class="thread-placeholder"></div>
+          <div class="thread-placeholder short"></div>
+          <div class="thread-placeholder"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="workspace-row">
+          <div class="workspace-icon">
+            <svg viewBox="0 0 24 24"><path d="M3.5 7.5h6l2-2h9v13h-17v-11Z"></path></svg>
+          </div>
+          <div class="workspace-copy">
+            <strong id="workspace-name">Workspace</strong>
+            <span id="workspace-path">Loading...</span>
+          </div>
+        </div>
+        <button class="icon-button" id="theme-toggle" aria-label="切换主题">
+          <svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"></path><circle cx="12" cy="12" r="4"></circle></svg>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" id="menu-button" aria-label="打开侧栏">
+            <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+          <div class="title-stack">
+            <h1 id="thread-title">新任务</h1>
+            <span id="thread-subtitle">准备就绪</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="status-pill"><i id="status-dot"></i><span id="status-text">本地</span></span>
+          <button class="icon-button" id="details-toggle" aria-label="切换详情面板">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="conversation" id="conversation">
+        <div class="welcome" id="welcome">
+          <div class="welcome-mark">
+            <svg viewBox="0 0 48 48"><path d="M14.5 7.8 24 2.4l9.5 5.4 9.2 5.4v21.6l-9.2 5.4-9.5 5.4-9.5-5.4-9.2-5.4V13.2l9.2-5.4Z"></path><path d="m16.4 17 7.6-4.4 7.6 4.4v8.9L24 30.3l-7.6-4.4V17Z"></path></svg>
+          </div>
+          <h2>今天想构建什么？</h2>
+          <p>描述任务，我会阅读代码、运行命令并在工作区中完成修改。</p>
+          <div class="suggestions">
+            <button data-prompt="分析这个项目的架构，并指出核心模块">分析项目架构</button>
+            <button data-prompt="运行测试并修复发现的问题">修复失败测试</button>
+            <button data-prompt="检查当前代码中的潜在安全问题">检查潜在问题</button>
+          </div>
+        </div>
+        <div class="messages" id="messages"></div>
+      </section>
+
+      <footer class="composer-wrap">
+        <form class="composer" id="composer">
+          <textarea id="prompt" rows="1" placeholder="向 Codex Java 提问，或描述要完成的任务"></textarea>
+          <div class="composer-toolbar">
+            <div class="composer-meta">
+              <button type="button" class="tool-button" title="附件暂未实现">
+                <svg viewBox="0 0 24 24"><path d="m9 12 6-6a3 3 0 0 1 4.2 4.2l-8.5 8.5a5 5 0 0 1-7.1-7.1L12 3.2"></path></svg>
+              </button>
+              <span class="mode-label" id="model-label">加载模型...</span>
+            </div>
+            <button class="send-button" id="send-button" type="submit" aria-label="发送">
+              <svg viewBox="0 0 24 24"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"></path></svg>
+            </button>
+          </div>
+        </form>
+        <p class="composer-hint">Codex Java 可能会执行命令并修改文件，请检查重要变更。</p>
+      </footer>
+    </main>
+
+    <aside class="details" id="details">
+      <div class="details-header">
+        <span>运行详情</span>
+        <button class="icon-button" id="details-close" aria-label="关闭详情面板">
+          <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+        </button>
+      </div>
+      <div class="details-content">
+        <section class="detail-card">
+          <div class="detail-label">环境</div>
+          <dl>
+            <div><dt>模型</dt><dd id="detail-model">—</dd></div>
+            <div><dt>沙箱</dt><dd id="detail-sandbox">—</dd></div>
+            <div><dt>审批</dt><dd id="detail-approval">—</dd></div>
+            <div><dt>多 Agent</dt><dd id="detail-multi-agent">—</dd></div>
+          </dl>
+        </section>
+        <section class="detail-card">
+          <div class="detail-label">当前会话</div>
+          <dl>
+            <div><dt>线程</dt><dd id="detail-thread">尚未创建</dd></div>
+            <div><dt>输入</dt><dd id="usage-input">0 tokens</dd></div>
+            <div><dt>输出</dt><dd id="usage-output">0 tokens</dd></div>
+          </dl>
+        </section>
+        <section class="detail-card event-card">
+          <div class="detail-label">事件流</div>
+          <div class="event-log" id="event-log">
+            <div class="empty-log">发送任务后，这里会实时显示执行事件。</div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

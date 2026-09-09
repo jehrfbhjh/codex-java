@@ -19,13 +19,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-record CodexRuntime(
+public record CodexRuntime(
         CodexConfig config,
         CodexAgent agent,
         SessionStore sessionStore,
         MultiAgentManager multiAgentManager
 ) implements AutoCloseable {
-    static CodexRuntime create(ConfigLoader.Overrides overrides) throws IOException {
+    public static CodexRuntime create(ConfigLoader.Overrides overrides) throws IOException {
         CodexConfig config = ConfigLoader.load(overrides);
         ObjectMapper mapper = new ObjectMapper();
         WorkspacePolicy workspacePolicy = new WorkspacePolicy(config.workingDirectory(), config.sandboxMode());
@@ -67,7 +67,7 @@ record CodexRuntime(
         );
     }
 
-    AgentExecutionContext registerRoot(SessionStore.Session session) {
+    public AgentExecutionContext registerRoot(SessionStore.Session session) {
         return multiAgentManager.registerRoot(session);
     }
 

@@ -5,6 +5,7 @@ import io.github.codexjava.agent.CodexAgent;
 import io.github.codexjava.agent.AgentExecutionContext;
 import io.github.codexjava.agent.SessionStore;
 import io.github.codexjava.config.ConfigLoader;
+import io.github.codexjava.web.CodexWebServer;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Callable;
 
 @Command(
@@ -25,7 +27,8 @@ import java.util.concurrent.Callable;
         subcommands = {
                 CodexJava.ExecCommand.class,
                 CodexJava.ResumeCommand.class,
-                CodexJava.SessionsCommand.class
+                CodexJava.SessionsCommand.class,
+                CodexJava.WebCommand.class
         }
 )
 public final class CodexJava implements Callable<Integer> {
@@ -228,6 +231,34 @@ public final class CodexJava implements Callable<Integer> {
                             summary.cwd()
                     );
                 }
+            }
+            return 0;
+        }
+    }
+
+    @Command(name = "web", mixinStandardHelpOptions = true, description = "Start the local Codex web interface.")
+    static final class WebCommand implements Callable<Integer> {
+        @Mixin
+        private CommonOptions options;
+
+        @Option(names = "--host", defaultValue = "127.0.0.1", description = "HTTP bind host.")
+        private String host;
+
+        @Option(names = "--port", defaultValue = "8765", description = "HTTP bind port.")
+        private int port;
+
+        @Override
+        public Integer call() throws Exception {
+            try (CodexRuntime runtime = CodexRuntime.create(options.overrides());
+                 CodexWebServer webServer = new CodexWebServer(runtime, host, port)) {
+                webServer.start();
+                System.out.printf(
+                        "Codex Java web is running at http://%s:%d%nWorkspace: %s%nPress Ctrl+C to stop.%n",
+                        host,
+                        webServer.port(),
+                        runtime.config().workingDirectory()
+                );
+                new CountDownLatch(1).await();
             }
             return 0;
         }

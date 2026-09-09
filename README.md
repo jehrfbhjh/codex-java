@@ -85,6 +85,46 @@ Agent，因此默认值 4 表示最多 3 个子 Agent turn 同时执行。
 
 ## 使用
 
+### Web 工作台
+
+启动本地 Codex 风格 Web 页面：
+
+```bash
+./codex-java web -C /path/to/repo
+```
+
+然后打开：
+
+```text
+http://127.0.0.1:8765
+```
+
+可以自定义监听地址和端口：
+
+```bash
+./codex-java web \
+  --host 127.0.0.1 \
+  --port 9000 \
+  -C /path/to/repo
+```
+
+Web 工作台包含：
+
+- 最近会话侧栏和新建任务；
+- 模型回答的实时流式展示；
+- reasoning summary、命令输出、补丁和 Multi Agent 调用卡片；
+- 模型、工作目录、沙箱、审批模式和 token usage；
+- 明暗主题与移动端响应式布局。
+
+页面由 Java 内置 HTTP Server 直接托管，不需要安装 Node.js。API Key 只由 Java
+进程从环境变量或 CLI 参数读取，不会发送给浏览器。浏览器只连接本机
+`/api/threads` 接口。
+
+> Web 模式目前没有交互式审批弹窗。使用 `on-request` 时，需要审批的危险命令会
+> 被拒绝；如需无交互执行，请仅在可信工作区内显式选择合适的审批和沙箱配置。
+
+### 终端模式
+
 交互模式：
 
 ```bash

@@ -20,6 +20,8 @@
 - 根目录到 cwd 的 `AGENTS.md` 叠加
 - JSONL 会话创建、恢复最近会话和列表
 - 交互 CLI 与非交互 `exec`
+- Java 内置 HTTP Server 和 Codex 风格 Web 工作台
+- Web NDJSON 流式 turn API、会话列表和运行配置展示
 - MultiAgent V2 的 `spawn_agent`、`send_message`、`followup_task`、`wait_agent`、
   `interrupt_agent`、`list_agents`
 - `/root/...` AgentPath、任务树、状态 JSON、独立子会话和父级完成通知
@@ -33,6 +35,8 @@
 - `apply_patch`：支持新增与基于上下文的修改；删除、重命名、复杂歧义消解待补。
 - 流协议：支持文本、reasoning summary、工具生命周期和 usage；rate limit、重试、
   context compaction、完整 typed item 和 provider-specific 元数据尚未覆盖。
+- Web：提供本地单用户工作台；尚未实现用户认证、跨进程恢复已打开线程、
+  Web 审批交互和生产级网络部署。
 - 会话：Java 自有 JSONL 格式遵循 ResponseItem 语义，但不保证 Rust SQLite/thread-store 双向兼容。
 - MultiAgent V2：核心工具协议与内存态执行逻辑按提交 `ea2046f` 移植；尚未实现
   resident Agent 的 LRU 卸载/跨进程冷加载、完整 parent/root turn metadata、
