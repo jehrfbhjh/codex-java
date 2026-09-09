@@ -1,0 +1,276 @@
+.sidebar {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 14px 10px 12px;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--sidebar);
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding: 0 5px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+}
+
+.brand-mark svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.45;
+}
+
+.brand-mark path:last-child {
+  opacity: .38;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.brand small {
+  margin-top: 1px;
+  color: var(--text-tertiary);
+  font-size: 9px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.new-thread {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 15px;
+  padding: 8px;
+  border: 0;
+  border-radius: var(--radius-medium);
+  background: var(--surface);
+  box-shadow: var(--shadow-small);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.new-thread:hover {
+  background: color-mix(in srgb, var(--surface) 78%, var(--surface-hover));
+  box-shadow: 0 2px 7px rgba(20, 20, 18, .07);
+}
+
+.button-icon,
+.workspace-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  color: var(--text-secondary);
+}
+
+.button-icon svg,
+.workspace-icon svg {
+  width: 16px;
+}
+
+kbd {
+  padding-right: 3px;
+  border: 0;
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.sidebar-section {
+  min-height: 0;
+  flex: 1;
+  margin-top: 24px;
+  overflow: hidden;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px 8px;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.thread-list {
+  display: flex;
+  max-height: 100%;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.thread-item {
+  width: 100%;
+  padding: 9px 10px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.thread-item:hover {
+  background: var(--surface-hover);
+}
+
+.thread-item.active {
+  background: var(--surface-active);
+}
+
+.thread-item strong,
+.thread-item span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thread-item strong {
+  font-size: 12px;
+  font-weight: 560;
+}
+
+.thread-item span {
+  margin-top: 4px;
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.thread-placeholder {
+  width: 88%;
+  height: 12px;
+  margin: 10px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--surface-hover), var(--surface), var(--surface-hover));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.thread-placeholder.short {
+  width: 62%;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 4px 0;
+  border-top: 1px solid var(--border);
+}
+
+.workspace-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.workspace-icon {
+  flex: 0 0 auto;
+  background: var(--surface);
+}
+
+.workspace-copy {
+  min-width: 0;
+}
+
+.workspace-copy strong,
+.workspace-copy span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-copy strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.workspace-copy span {
+  max-width: 135px;
+  margin-top: 2px;
+  color: var(--text-tertiary);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+}
+
+.details {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 30;
+  width: min(var(--details-width), 92vw);
+  border-left: 1px solid var(--border);
+  background: var(--sidebar);
+  box-shadow: var(--shadow-large);
+  transform: translateX(102%);
+  transition: transform 200ms ease;
+}
+
+.details.open {
+  transform: translateX(0);
+}
+
+.details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--topbar-height);
+  padding: 0 12px 0 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.details-header strong,
+.details-header span {
+  display: block;
+}
+
+.details-header strong {
+  font-size: 12px;
+}
+
+.details-header span {
+  margin-top: 2px;
+  color: var(--text-tertiary);
+  font-size: 9px;
+}
+
+.details-content {
+  height: calc(100vh - var(--topbar-height));
+  padding: 16px;
+  overflow-y: auto;
+}

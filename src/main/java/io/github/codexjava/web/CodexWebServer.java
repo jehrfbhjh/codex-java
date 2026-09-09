@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import io.github.codexjava.agent.AgentExecutionContext;
 import io.github.codexjava.agent.CodexAgent;
 import io.github.codexjava.agent.SessionStore;
 import io.github.codexjava.cli.CodexRuntime;
@@ -24,7 +23,7 @@ public final class CodexWebServer implements AutoCloseable {
     private final CodexRuntime runtime;
     private final ObjectMapper mapper;
     private final HttpServer server;
-    private final Map<String, AgentExecutionContext> threads = new ConcurrentHashMap<>();
+    private final Map<String, CodexRuntime.ThreadRuntime> threads = new ConcurrentHashMap<>();
 
     public CodexWebServer(CodexRuntime runtime, String host, int port) throws IOException {
         this.runtime = runtime;
@@ -52,6 +51,8 @@ public final class CodexWebServer implements AutoCloseable {
     @Override
     public void close() {
         server.stop(0);
+        threads.values().forEach(CodexRuntime.ThreadRuntime::close);
+        threads.clear();
     }
 
     private void handleStatic(HttpExchange exchange) throws IOException {
@@ -63,7 +64,13 @@ public final class CodexWebServer implements AutoCloseable {
         String resource = switch (path) {
             case "/", "/index.html" -> "/web/index.html";
             case "/app.css" -> "/web/app.css";
+            case "/panels.css" -> "/web/panels.css";
+            case "/conversation.css" -> "/web/conversation.css";
+            case "/composer.css" -> "/web/composer.css";
+            case "/responsive.css" -> "/web/responsive.css";
             case "/app.js" -> "/web/app.js";
+            case "/ui.js" -> "/web/ui.js";
+            case "/shell.js" -> "/web/shell.js";
             default -> null;
         };
         if (resource == null) {
@@ -126,6 +133,13 @@ public final class CodexWebServer implements AutoCloseable {
         String prefix = "/api/threads/";
         if ("POST".equals(exchange.getRequestMethod())
                 && path.startsWith(prefix)
+                && path.endsWith("/resume")) {
+            String threadId = path.substring(prefix.length(), path.length() - "/resume".length());
+            resumeThread(exchange, threadId);
+            return;
+        }
+        if ("POST".equals(exchange.getRequestMethod())
+                && path.startsWith(prefix)
                 && path.endsWith("/turn")) {
             String threadId = path.substring(prefix.length(), path.length() - "/turn".length());
             runTurn(exchange, threadId);
@@ -136,18 +150,38 @@ public final class CodexWebServer implements AutoCloseable {
 
     private void createThread(HttpExchange exchange) throws IOException {
         SessionStore.Session session = runtime.agent().newSession();
-        AgentExecutionContext context = runtime.registerRoot(session);
-        threads.put(session.id(), context);
+        CodexRuntime.ThreadRuntime thread = runtime.openThread(session);
+        threads.put(session.id(), thread);
+        sendThread(exchange, 201, session.id());
+    }
+
+    private void resumeThread(HttpExchange exchange, String threadId) throws IOException {
+        CodexRuntime.ThreadRuntime existing = threads.get(threadId);
+        if (existing == null) {
+            SessionStore.Session session;
+            try {
+                session = runtime.sessionStore().resume(threadId);
+            } catch (IOException error) {
+                sendError(exchange, 404, error.getMessage());
+                return;
+            }
+            existing = runtime.openThread(session);
+            threads.put(threadId, existing);
+        }
+        sendThread(exchange, 200, threadId);
+    }
+
+    private void sendThread(HttpExchange exchange, int status, String threadId) throws IOException {
         ObjectNode response = mapper.createObjectNode();
-        response.put("thread_id", session.id());
+        response.put("thread_id", threadId);
         response.put("model", runtime.config().model());
         response.put("cwd", runtime.config().workingDirectory().toString());
-        sendJson(exchange, 201, response);
+        sendJson(exchange, status, response);
     }
 
     private void runTurn(HttpExchange exchange, String threadId) throws IOException {
-        AgentExecutionContext context = threads.get(threadId);
-        if (context == null) {
+        CodexRuntime.ThreadRuntime thread = threads.get(threadId);
+        if (thread == null) {
             sendError(exchange, 404, "Unknown or expired thread: " + threadId);
             return;
         }
@@ -172,9 +206,9 @@ public final class CodexWebServer implements AutoCloseable {
         try (OutputStream output = exchange.getResponseBody()) {
             Object lock = new Object();
             CodexAgent.TurnResult result;
-            synchronized (context) {
-                result = runtime.agent().runTurn(
-                        context,
+            synchronized (thread.context()) {
+                result = thread.agent().runTurn(
+                        thread.context(),
                         userMessage(prompt),
                         ignored -> {
                         },

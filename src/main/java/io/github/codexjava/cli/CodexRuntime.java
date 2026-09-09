@@ -71,8 +71,37 @@ public record CodexRuntime(
         return multiAgentManager.registerRoot(session);
     }
 
+    public ThreadRuntime openThread(SessionStore.Session session) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        WorkspacePolicy workspacePolicy = new WorkspacePolicy(config.workingDirectory(), config.sandboxMode());
+        ApprovalGate approvalGate = new ApprovalGate(config.approvalPolicy());
+        MultiAgentManager.AgentFactory agentFactory = (agentConfig, manager) ->
+                createAgent(agentConfig, mapper, sessionStore, workspacePolicy, approvalGate, manager);
+        MultiAgentManager manager = new MultiAgentManager(mapper, sessionStore, config, agentFactory);
+        CodexAgent threadAgent = createAgent(
+                config,
+                mapper,
+                sessionStore,
+                workspacePolicy,
+                approvalGate,
+                manager
+        );
+        return new ThreadRuntime(threadAgent, manager.registerRoot(session), manager);
+    }
+
     @Override
     public void close() {
         multiAgentManager.close();
+    }
+
+    public record ThreadRuntime(
+            CodexAgent agent,
+            AgentExecutionContext context,
+            MultiAgentManager manager
+    ) implements AutoCloseable {
+        @Override
+        public void close() {
+            manager.close();
+        }
     }
 }

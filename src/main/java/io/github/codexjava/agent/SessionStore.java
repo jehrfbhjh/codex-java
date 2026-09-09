@@ -64,17 +64,40 @@ public final class SessionStore {
                     .max(Comparator.comparingLong(this::modifiedTime))
                     .orElseThrow(() -> new IOException("No saved Java sessions found"));
         }
+        return load(latest);
+    }
+
+    public Session resume(String sessionId) throws IOException {
+        try {
+            UUID.fromString(sessionId);
+        } catch (IllegalArgumentException error) {
+            throw new IOException("Invalid session id", error);
+        }
+        if (!Files.isDirectory(sessionsRoot)) {
+            throw new IOException("No saved Java sessions found");
+        }
+        String expectedName = "rollout-" + sessionId + ".jsonl";
+        Path sessionFile;
+        try (Stream<Path> paths = Files.walk(sessionsRoot)) {
+            sessionFile = paths.filter(path -> expectedName.equals(path.getFileName().toString()))
+                    .findFirst()
+                    .orElseThrow(() -> new IOException("Unknown session: " + sessionId));
+        }
+        return load(sessionFile);
+    }
+
+    private Session load(Path file) throws IOException {
         ArrayNode input = mapper.createArrayNode();
-        String id = latest.getFileName().toString()
+        String id = file.getFileName().toString()
                 .replace("rollout-", "")
                 .replace(".jsonl", "");
-        for (String line : Files.readAllLines(latest, StandardCharsets.UTF_8)) {
+        for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
             JsonNode event = mapper.readTree(line);
             if ("response_item".equals(event.path("type").asText()) && event.has("item")) {
                 input.add(event.get("item"));
             }
         }
-        return new Session(id, latest, input);
+        return new Session(id, file, input);
     }
 
     public void appendItem(Session session, JsonNode item) throws IOException {

@@ -1,0 +1,104 @@
+.composer-wrap {
+  padding: 10px 24px 14px;
+  background: linear-gradient(180deg, transparent, var(--surface) 26%);
+}
+
+.composer {
+  width: min(var(--content-width), 100%);
+  margin: 0 auto;
+  padding: 11px 12px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  background: var(--surface);
+  box-shadow: var(--shadow-medium);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.composer:focus-within {
+  border-color: color-mix(in srgb, var(--border) 45%, var(--text));
+  box-shadow: 0 16px 42px rgba(20, 20, 18, .12);
+}
+
+.composer textarea {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  padding: 2px 5px 10px;
+  resize: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  line-height: 1.5;
+}
+
+.composer textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.composer textarea:disabled {
+  cursor: wait;
+  opacity: .72;
+}
+
+.composer-toolbar,
+.composer-meta {
+  display: flex;
+  align-items: center;
+}
+
+.composer-toolbar {
+  justify-content: space-between;
+}
+
+.composer-meta {
+  gap: 7px;
+}
+
+.tool-button {
+  width: 29px;
+  height: 29px;
+  color: var(--text-secondary);
+}
+
+.tool-button svg {
+  width: 16px;
+}
+
+.model-label {
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.send-button {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.send-button:disabled {
+  opacity: .24;
+  cursor: default;
+}
+
+.send-button:not(:disabled):active {
+  transform: scale(.94);
+}
+
+.send-button svg {
+  width: 17px;
+}
+
+.composer-hint {
+  margin: 7px auto 0;
+  color: var(--text-tertiary);
+  font-size: 9px;
+  text-align: center;
+}

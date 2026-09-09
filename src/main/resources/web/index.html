@@ -6,47 +6,54 @@
   <meta name="color-scheme" content="light dark">
   <title>Codex Java</title>
   <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/panels.css">
+  <link rel="stylesheet" href="/conversation.css">
+  <link rel="stylesheet" href="/composer.css">
+  <link rel="stylesheet" href="/responsive.css">
 </head>
 <body>
   <div class="app-shell">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M7.4 3.8 12 1.2l4.6 2.6 4.5 2.6v11.2l-4.5 2.6L12 22.8l-4.6-2.6-4.5-2.6V6.4l4.5-2.6Z"></path><path d="m8.1 8.2 3.9-2.3 3.9 2.3v4.6L12 15.1l-3.9-2.3V8.2Z"></path></svg>
-        </div>
-        <span>Codex Java</span>
-        <button class="icon-button sidebar-close" id="sidebar-close" aria-label="关闭侧栏">
+    <aside class="sidebar" id="sidebar" aria-label="任务导航">
+      <div class="brand-row">
+        <a class="brand" href="/" aria-label="Codex Java 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7.4 3.8 12 1.2l4.6 2.6 4.5 2.6v11.2l-4.5 2.6L12 22.8l-4.6-2.6-4.5-2.6V6.4l4.5-2.6Z"></path><path d="m8.1 8.2 3.9-2.3 3.9 2.3v4.6L12 15.1l-3.9-2.3V8.2Z"></path></svg>
+          </span>
+          <span><strong>Codex</strong><small>Java workspace</small></span>
+        </a>
+        <button class="icon-button mobile-only" id="sidebar-close" type="button" aria-label="关闭任务导航">
           <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg>
         </button>
       </div>
 
-      <button class="new-thread" id="new-thread">
-        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+      <button class="new-thread" id="new-thread" type="button">
+        <span class="button-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></span>
         <span>新建任务</span>
-        <kbd>⌘ N</kbd>
+        <kbd>⌘N</kbd>
       </button>
 
-      <div class="sidebar-section">
-        <div class="section-label">最近任务</div>
-        <div class="thread-list" id="thread-list">
+      <section class="sidebar-section" aria-labelledby="recent-label">
+        <div class="section-heading">
+          <span id="recent-label">最近任务</span>
+          <span id="session-count"></span>
+        </div>
+        <div class="thread-list" id="thread-list" aria-live="polite">
           <div class="thread-placeholder"></div>
           <div class="thread-placeholder short"></div>
           <div class="thread-placeholder"></div>
         </div>
-      </div>
+      </section>
 
       <div class="sidebar-footer">
         <div class="workspace-row">
-          <div class="workspace-icon">
-            <svg viewBox="0 0 24 24"><path d="M3.5 7.5h6l2-2h9v13h-17v-11Z"></path></svg>
-          </div>
-          <div class="workspace-copy">
+          <span class="workspace-icon"><svg viewBox="0 0 24 24"><path d="M3.5 7.5h6l2-2h9v13h-17v-11Z"></path></svg></span>
+          <span class="workspace-copy">
             <strong id="workspace-name">Workspace</strong>
-            <span id="workspace-path">Loading...</span>
-          </div>
+            <span id="workspace-path">正在加载…</span>
+          </span>
         </div>
-        <button class="icon-button" id="theme-toggle" aria-label="切换主题">
-          <svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"></path><circle cx="12" cy="12" r="4"></circle></svg>
+        <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深色模式" aria-pressed="false">
+          <svg viewBox="0 0 24 24"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8 8 0 1 0 20 15.2Z"></path></svg>
         </button>
       </div>
     </aside>
@@ -54,33 +61,39 @@
     <main class="main">
       <header class="topbar">
         <div class="topbar-left">
-          <button class="icon-button menu-button" id="menu-button" aria-label="打开侧栏">
+          <button class="icon-button mobile-only" id="menu-button" type="button" aria-label="打开任务导航">
             <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
           </button>
           <div class="title-stack">
             <h1 id="thread-title">新任务</h1>
-            <span id="thread-subtitle">准备就绪</span>
+            <span id="thread-subtitle">选择一个任务，或从下方开始</span>
           </div>
         </div>
         <div class="topbar-actions">
-          <span class="status-pill"><i id="status-dot"></i><span id="status-text">本地</span></span>
-          <button class="icon-button" id="details-toggle" aria-label="切换详情面板">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+          <span class="status" id="status" role="status"><i></i><span id="status-text">连接中</span></span>
+          <button class="icon-button" id="details-toggle" type="button" aria-label="打开运行详情" aria-expanded="false">
+            <svg viewBox="0 0 24 24"><path d="M5 5h14v14H5zM9 5v14"></path></svg>
           </button>
         </div>
       </header>
 
-      <section class="conversation" id="conversation">
+      <section class="conversation" id="conversation" aria-live="polite">
         <div class="welcome" id="welcome">
-          <div class="welcome-mark">
-            <svg viewBox="0 0 48 48"><path d="M14.5 7.8 24 2.4l9.5 5.4 9.2 5.4v21.6l-9.2 5.4-9.5 5.4-9.5-5.4-9.2-5.4V13.2l9.2-5.4Z"></path><path d="m16.4 17 7.6-4.4 7.6 4.4v8.9L24 30.3l-7.6-4.4V17Z"></path></svg>
+          <div class="welcome-copy">
+            <span class="eyebrow">本地编码 Agent</span>
+            <h2>今天要处理什么？</h2>
+            <p>描述目标和约束。Codex Java 会阅读代码、执行命令，并把每一步保留在当前任务中。</p>
           </div>
-          <h2>今天想构建什么？</h2>
-          <p>描述任务，我会阅读代码、运行命令并在工作区中完成修改。</p>
-          <div class="suggestions">
-            <button data-prompt="分析这个项目的架构，并指出核心模块">分析项目架构</button>
-            <button data-prompt="运行测试并修复发现的问题">修复失败测试</button>
-            <button data-prompt="检查当前代码中的潜在安全问题">检查潜在问题</button>
+          <div class="suggestions" aria-label="任务建议">
+            <button type="button" data-prompt="分析这个项目的架构，并指出核心模块">
+              <span><strong>理解代码库</strong><small>梳理架构与核心模块</small></span><i>↗</i>
+            </button>
+            <button type="button" data-prompt="运行测试并修复发现的问题">
+              <span><strong>修复失败测试</strong><small>定位问题并完成修改</small></span><i>↗</i>
+            </button>
+            <button type="button" data-prompt="检查当前代码中的潜在安全问题">
+              <span><strong>检查潜在问题</strong><small>关注安全与可靠性</small></span><i>↗</i>
+            </button>
           </div>
         </div>
         <div class="messages" id="messages"></div>
@@ -88,27 +101,27 @@
 
       <footer class="composer-wrap">
         <form class="composer" id="composer">
-          <textarea id="prompt" rows="1" placeholder="向 Codex Java 提问，或描述要完成的任务"></textarea>
+          <textarea id="prompt" rows="1" placeholder="描述一个任务…" aria-label="任务内容"></textarea>
           <div class="composer-toolbar">
             <div class="composer-meta">
-              <button type="button" class="tool-button" title="附件暂未实现">
+              <button type="button" class="tool-button" id="attachment-button" aria-label="添加附件">
                 <svg viewBox="0 0 24 24"><path d="m9 12 6-6a3 3 0 0 1 4.2 4.2l-8.5 8.5a5 5 0 0 1-7.1-7.1L12 3.2"></path></svg>
               </button>
-              <span class="mode-label" id="model-label">加载模型...</span>
+              <span class="model-label" id="model-label">加载模型…</span>
             </div>
-            <button class="send-button" id="send-button" type="submit" aria-label="发送">
+            <button class="send-button" id="send-button" type="submit" aria-label="发送任务" disabled>
               <svg viewBox="0 0 24 24"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"></path></svg>
             </button>
           </div>
         </form>
-        <p class="composer-hint">Codex Java 可能会执行命令并修改文件，请检查重要变更。</p>
+        <p class="composer-hint">Enter 发送 · Shift + Enter 换行</p>
       </footer>
     </main>
 
-    <aside class="details" id="details">
+    <aside class="details" id="details" aria-label="运行详情" aria-hidden="true">
       <div class="details-header">
-        <span>运行详情</span>
-        <button class="icon-button" id="details-close" aria-label="关闭详情面板">
+        <div><strong>运行详情</strong><span>当前任务的环境和事件</span></div>
+        <button class="icon-button" id="details-close" type="button" aria-label="关闭运行详情">
           <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg>
         </button>
       </div>
@@ -133,13 +146,14 @@
         <section class="detail-card event-card">
           <div class="detail-label">事件流</div>
           <div class="event-log" id="event-log">
-            <div class="empty-log">发送任务后，这里会实时显示执行事件。</div>
+            <div class="empty-log">发送任务后，这里会显示实时执行事件。</div>
           </div>
         </section>
       </div>
     </aside>
   </div>
-  <div class="toast" id="toast"></div>
-  <script src="/app.js"></script>
+  <button class="scrim" id="scrim" type="button" aria-label="关闭面板"></button>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="/app.js"></script>
 </body>
 </html>

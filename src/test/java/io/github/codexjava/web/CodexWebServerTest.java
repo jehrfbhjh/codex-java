@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import io.github.codexjava.agent.SessionStore;
 import io.github.codexjava.cli.CodexRuntime;
 import io.github.codexjava.config.ConfigLoader;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,24 @@ class CodexWebServerTest {
                     HttpResponse.BodyHandlers.ofString()
             );
             assertEquals(200, page.statusCode());
-            assertTrue(page.body().contains("Codex Java"));
+            assertTrue(page.body().contains("今天要处理什么"));
+
+            for (String asset : List.of(
+                    "/app.css",
+                    "/panels.css",
+                    "/conversation.css",
+                    "/composer.css",
+                    "/responsive.css",
+                    "/app.js",
+                    "/ui.js",
+                    "/shell.js"
+            )) {
+                HttpResponse<String> resource = client.send(
+                        HttpRequest.newBuilder(base.resolve(asset)).GET().build(),
+                        HttpResponse.BodyHandlers.ofString()
+                );
+                assertEquals(200, resource.statusCode(), asset);
+            }
 
             HttpResponse<String> created = client.send(
                     HttpRequest.newBuilder(base.resolve("/api/threads"))
@@ -95,6 +113,46 @@ class CodexWebServerTest {
             ));
             assertTrue(events.stream().anyMatch(event -> "turn.completed".equals(event.path("type").asText())));
             assertEquals("stream.done", events.get(events.size() - 1).path("type").asText());
+            assertEquals(threadId, events.get(events.size() - 1).path("thread_id").asText());
+
+            SessionStore.Session resumedSession = runtime.sessionStore().resume(threadId);
+            assertEquals(threadId, resumedSession.id());
+            assertTrue(resumedSession.input().size() >= 2);
+
+            HttpResponse<String> resumed = client.send(
+                    HttpRequest.newBuilder(base.resolve("/api/threads/" + threadId + "/resume"))
+                            .POST(HttpRequest.BodyPublishers.noBody())
+                            .build(),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+            assertEquals(200, resumed.statusCode());
+            assertEquals(threadId, mapper.readTree(resumed.body()).path("thread_id").asText());
+
+            HttpResponse<String> secondCreated = client.send(
+                    HttpRequest.newBuilder(base.resolve("/api/threads"))
+                            .POST(HttpRequest.BodyPublishers.noBody())
+                            .build(),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+            String secondThreadId = mapper.readTree(secondCreated.body()).path("thread_id").asText();
+            assertTrue(!threadId.equals(secondThreadId));
+
+            HttpResponse<String> secondTurn = client.send(
+                    HttpRequest.newBuilder(base.resolve("/api/threads/" + secondThreadId + "/turn"))
+                            .header("Content-Type", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString("{\"prompt\":\"second task\"}"))
+                            .build(),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+            List<JsonNode> secondEvents = secondTurn.body().lines().map(line -> {
+                try {
+                    return mapper.readTree(line);
+                } catch (IOException error) {
+                    throw new IllegalArgumentException(error);
+                }
+            }).toList();
+            assertEquals(secondThreadId,
+                    secondEvents.get(secondEvents.size() - 1).path("thread_id").asText());
         } finally {
             api.stop(0);
         }
