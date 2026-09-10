@@ -90,7 +90,7 @@ Agent，因此默认值 4 表示最多 3 个子 Agent turn 同时执行。
 启动本地 Codex 风格 Web 页面：
 
 ```bash
-./codex-java web -C /path/to/repo
+./codex-java web -C /Users/bytedance/codex-java
 ```
 
 然后打开：
@@ -105,7 +105,7 @@ http://127.0.0.1:8765
 ./codex-java web \
   --host 127.0.0.1 \
   --port 9000 \
-  -C /path/to/repo
+  -C /Users/bytedance/codex-java
 ```
 
 Web 工作台包含：
@@ -128,26 +128,26 @@ Web 工作台包含：
 交互模式：
 
 ```bash
-./codex-java -C /path/to/repo
+./codex-java -C /Users/bytedance/codex-java
 ```
 
 非交互模式：
 
 ```bash
-./codex-java exec -C /path/to/repo "检查项目并修复失败的单元测试"
+./codex-java exec -C /Users/bytedance/codex-java "检查项目并修复失败的单元测试"
 ```
 
 默认 human 模式会将模型回答按 token 实时写入 stdout，并将 reasoning 摘要、命令、
 补丁和协作工具状态写入 stderr，因此可以单独保存最终回答：
 
 ```bash
-./codex-java exec -C /path/to/repo "检查项目" > answer.md
+./codex-java exec -C /Users/bytedance/codex-java "检查项目" > answer.md
 ```
 
 机器集成或调试执行轨迹时，使用 Codex 兼容风格的 JSONL 事件流：
 
 ```bash
-./codex-java exec --json -C /path/to/repo "检查项目并运行测试" | tee trace.jsonl
+./codex-java exec --json -C /Users/bytedance/codex-java "检查项目并运行测试" | tee trace.jsonl
 ```
 
 每行都是独立 JSON，对应的核心事件包括：
@@ -167,7 +167,7 @@ App Server v2 和完整事件全集仍属于后续里程碑。
 通过 stdin 提交提示：
 
 ```bash
-printf '总结这个项目的架构' | ./codex-java exec -C /path/to/repo
+printf '总结这个项目的架构' | ./codex-java exec -C /Users/bytedance/codex-java
 ```
 
 恢复最近会话：

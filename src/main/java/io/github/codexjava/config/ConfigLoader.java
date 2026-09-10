@@ -67,13 +67,26 @@ public final class ConfigLoader {
         Path cwd = overrides.workingDirectory() == null
                 ? Path.of(System.getProperty("user.dir"))
                 : overrides.workingDirectory();
+        Path normalizedCwd = cwd.toAbsolutePath().normalize();
+        if (!Files.exists(normalizedCwd)) {
+            throw new IOException(
+                    "Working directory does not exist: " + normalizedCwd
+                            + ". Replace placeholder paths such as /path/to/repo with the actual project directory."
+            );
+        }
+        if (!Files.isDirectory(normalizedCwd)) {
+            throw new IOException("Working directory is not a directory: " + normalizedCwd);
+        }
+        if (!Files.isReadable(normalizedCwd)) {
+            throw new IOException("Working directory is not readable: " + normalizedCwd);
+        }
 
         return new CodexConfig(
                 model,
                 normalizeBaseUrl(baseUrl),
                 apiKey,
                 codexHome.toAbsolutePath().normalize(),
-                cwd.toAbsolutePath().normalize(),
+                normalizedCwd,
                 CodexConfig.ApprovalPolicy.parse(approval),
                 CodexConfig.SandboxMode.parse(sandbox),
                 Duration.ofSeconds(180),

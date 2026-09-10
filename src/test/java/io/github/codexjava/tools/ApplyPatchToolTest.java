@@ -76,6 +76,16 @@ class ApplyPatchToolTest {
     }
 
     @Test
+    void rejectsMissingCommandWorkingDirectoryClearly() {
+        WorkspacePolicy policy = new WorkspacePolicy(workspace, CodexConfig.SandboxMode.WORKSPACE_WRITE);
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> policy.resolveWorkingDirectory(workspace.resolve("missing").toString())
+        );
+        assertTrue(error.getMessage().contains("Working directory does not exist"));
+    }
+
+    @Test
     void readOnlyModeRejectsPatch() {
         ObjectMapper mapper = new ObjectMapper();
         ApplyPatchTool tool = new ApplyPatchTool(

@@ -2,6 +2,7 @@ package io.github.codexjava.tools;
 
 import io.github.codexjava.config.CodexConfig;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class WorkspacePolicy {
@@ -19,6 +20,12 @@ public final class WorkspacePolicy {
                 : Path.of(value).toAbsolutePath().normalize();
         if (mode != CodexConfig.SandboxMode.DANGER_FULL_ACCESS && !candidate.startsWith(workspace)) {
             throw new SecurityException("Working directory is outside the workspace: " + candidate);
+        }
+        if (!Files.exists(candidate)) {
+            throw new IllegalArgumentException("Working directory does not exist: " + candidate);
+        }
+        if (!Files.isDirectory(candidate)) {
+            throw new IllegalArgumentException("Working directory is not a directory: " + candidate);
         }
         return candidate;
     }
